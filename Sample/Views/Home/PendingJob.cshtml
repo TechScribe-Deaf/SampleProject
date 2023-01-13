@@ -1,0 +1,43 @@
+@model WorkItemModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="col-4"></div>
+    <div class="col-4">
+        <div id="WaitingNotice">
+            <h3>Waiting for Job to Complete</h3>
+        </div>
+        <div id="SuccessNotice" class="d-none">
+            <h3>Successfully Processed CSV File</h3>
+            <a href="" id="downloadLink"><button>Download Output File</button></a>
+        </div>
+    </div>
+    <div class="col-4"></div>
+</div>
+
+@section Scripts {
+<script type="text/javascript">
+    const delay = ms => new Promise(res => setTimeout(res, ms));
+    function CheckJob() {
+        $.ajax({
+            data: {
+                "WorkItemID":@(Model?.WorkItemID ?? 0)
+            },
+            dataType: "json",
+            url: '@Url.Action("CheckJob", "API")'
+        }).done(function (info){
+            $('#downloadLink').attr('href', info.downloadPath);
+            $('#WaitingNotice').toggleClass('d-none');
+            $('#SuccessNotice').toggleClass('d-none');
+        }).fail(async function () {
+            await delay(5000);
+            CheckJob();
+        });
+    }
+    $(document).ready(function () {
+        CheckJob();
+    });
+</script>
+}

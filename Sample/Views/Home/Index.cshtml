@@ -1,0 +1,21 @@
+﻿@model SubmitJobModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="col-4"></div>
+    <div class="col-4">
+        @using (Html.BeginForm("SubmitJob", "API", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div class="form-group">
+                @Html.DisplayFor(m => m.File)
+                @Html.TextBoxFor(m => m.File, new { type = "file" })
+            </div>
+            <div class="form-group text-center">
+                <button class="btn btn-info">Upload</button>
+            </div>
+        }
+    </div>
+    <div class="col-4"></div>
+</div>

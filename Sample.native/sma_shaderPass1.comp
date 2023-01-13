@@ -1,0 +1,48 @@
+#version 450
+#define WORKGROUP_SIZE 256
+#define PERIOD 14
+layout (local_size_x = WORKGROUP_SIZE, local_size_y = 1, local_size_z = 1 ) in;
+
+struct candlestick{
+  float open;
+  float high;
+  float low;
+  float close;
+};
+
+struct indictator
+{
+  float sma;
+  float padding1;
+  float padding2;
+  float padding3;
+};
+
+layout(std140, binding = 0) buffer inputBuffer
+{
+   candlestick kline[];
+};
+
+layout(std140, binding = 1) buffer outputBuffer
+{
+    indictator result[];
+};
+
+float calculateSMA_PartOne(uint x)
+{
+  float sum = kline[x].close;
+  for (uint i = 1; i < PERIOD; ++i)
+  {
+    sum += kline[x - i].close;
+  }
+  return sum / PERIOD;
+}
+
+void main() {
+  uint x = uint(gl_GlobalInvocationID.x);
+
+  if (x >= PERIOD)
+    result[x].sma = calculateSMA_PartOne(x);
+  else
+    result[x].sma = 1;
+}
